@@ -1,19 +1,36 @@
 const fastify = require('fastify')()
-const path = require('path')
+const fastifyPlugin = require('fastify-plugin')
+const routes = require('./routes')
+const { Client } = require('pg')
 
-//handles GET / request
-fastify.get('/', async (request, reply) => {
-  try {
-    return { message: "hello, world!" }
-  }
-  catch (e) { console.log(e) }
+const client = new Client({
+  host: '127.0.0.1',
+  port: 5432,
+  database: 'items'
 })
 
+async function dbconnector(fastify, options) {
+  try {
+    await client.connect()
+    console.log("db connected succesfully")
+    fastify.decorate('db', { client })
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+fastify.register(fastifyPlugin(dbconnector))
+fastify.register(routes)
+
 //launching server at port : 3000 in local environment
-fastify.listen(process.env.PORT || 3000, '0.0.0.0', (err) => {
-  if (err) {
+async function start() {
+  try {
+    await fastify.listen(3000)
+  } catch (err) {
     fastify.log.error(err)
     process.exit(1)
   }
   console.log(`server running at ${fastify.server.address().port}`)
-})
+}
+
+start()
