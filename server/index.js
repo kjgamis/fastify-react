@@ -1,36 +1,31 @@
-const fastify = require('fastify')()
+const fastify = require('fastify')({ logger: { prettyPrint: true } })
 const fastifyPlugin = require('fastify-plugin')
+const fastifyStatic = require('fastify-static')
+const fastifySwagger = require('fastify-swagger')
+const path = require('path')
+const swaggerOptions = require('./swagger')
 const routes = require('./routes')
-const { Client } = require('pg')
+const client = require('./dbClient')
 
-const client = new Client({
-  host: '127.0.0.1',
-  port: 5432,
-  database: 'items'
-})
-
-async function dbconnector(fastify, options) {
-  try {
-    await client.connect()
-    console.log("db connected succesfully")
-    fastify.decorate('db', { client })
-  } catch (err) {
-    console.error(err)
-  }
+const dbconnector = async (fastify, options) => {
+  client.connect()
+  console.log("db connected succesfully")
+  fastify.decorate('client', client)
 }
 
-fastify.register(fastifyPlugin(dbconnector))
+fastify.register(fastifyStatic, {
+  root: path.join(__dirname, '..', 'dist'),
+})
 fastify.register(routes)
+fastify.register(fastifyPlugin(dbconnector))
+fastify.register(fastifySwagger, swaggerOptions)
 
 //launching server at port : 3000 in local environment
-async function start() {
-  try {
-    await fastify.listen(3000)
-  } catch (err) {
-    fastify.log.error(err)
-    process.exit(1)
+fastify.listen(3000, (error) => {
+  if (error) {
+    fastify.log.error(error)
+    return process.exit(1)
   }
-  console.log(`server running at ${fastify.server.address().port}`)
-}
-
-start()
+  fastify.swagger()
+  console.info(`Please visit http://localhost:${fastify.server.address().port}`)
+})
