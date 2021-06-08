@@ -4,7 +4,7 @@ const client = require('./dbClient')
 const controller = {
 
   fetchItems: async (request, reply) => {
-    client.query('SELECT * FROM todos', async (error, results) => {
+    client.query('SELECT * FROM todos', (error, results) => {
       if (error) throw new Error(error)
       reply.status(200).send(results.rows)
     })
@@ -19,7 +19,7 @@ const controller = {
       values: [id, name, createdAt]
     }
 
-    client.query(query, async (error, results) => {
+    client.query(query, (error, results) => {
       if (error) throw new Error(error)
       console.log(results.rows)
       reply.status(200).send({ created: true })
@@ -33,7 +33,7 @@ const controller = {
       text: `UPDATE todos SET name = $2 WHERE id = $1 RETURNING *`,
       values: [id, name]
     }
-    client.query(query, async (error, results) => {
+    client.query(query, (error, results) => {
       if (error) throw new Error(error)
       console.log(results.rows)
       reply.status(200).send({ updated: true })
@@ -46,7 +46,7 @@ const controller = {
       text: `DELETE FROM todos WHERE id = $1 RETURNING *`,
       values: [id]
     }
-    client.query(query, async (error, results) => {
+    client.query(query, (error, results) => {
       if (error) throw new Error(error)
       console.log(results.rows)
       reply.status(200).send({ deleted: true })

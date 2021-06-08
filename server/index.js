@@ -1,4 +1,5 @@
 const fastify = require('fastify')({ logger: { prettyPrint: true } })
+const fastifyCors = require('fastify-cors')
 const fastifyPlugin = require('fastify-plugin')
 const fastifyStatic = require('fastify-static')
 const fastifySwagger = require('fastify-swagger')
@@ -15,6 +16,9 @@ const dbconnector = async (fastify, options) => {
 
 fastify.register(fastifyStatic, {
   root: path.join(__dirname, '..', 'dist'),
+})
+fastify.register(fastifyCors, { 
+  origin: true
 })
 fastify.register(routes)
 fastify.register(fastifyPlugin(dbconnector))

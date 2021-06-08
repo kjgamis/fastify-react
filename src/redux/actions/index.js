@@ -3,21 +3,19 @@ export const READ = 'READ'
 export const UPDATE = 'UPDATE'
 export const DELETE = 'DELETE'
 
-export const createItemAction = (item) => ({
-  type: CREATE,
-  data: { item }
-})
+export const FETCH_ITEMS_START = FETCH_ITEMS_START
+export const FETCH_ITEMS_SUCCESS = FETCH_ITEMS_SUCCESS
+export const FETCH_ITEMS_FAILURE = FETCH_ITEMS_FAILURE
 
-export const readAction = () => ({
-  type: READ
-})
-
-export const updateItemAction = (item) => ({
-  type: UPDATE,
-  data: { item }
-})
-
-export const deleteItemAction = (id) => ({
-  type: DELETE,
-  data: { id }
-})
+export const fetchItems = () => {
+  return (dispatch) => {
+    dispatch({ type: FETCH_ITEMS_START })
+    fetch('/items')
+      .then(res => res.json())
+      .then(data => {
+        console.log(data)
+        dispatch({ type: FETCH_ITEMS_SUCCESS, items: data })
+      })
+      .catch(error => dispatch({ type: FETCH_ITEMS_FAILURE, error }))
+  }
+}
