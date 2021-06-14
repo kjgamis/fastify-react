@@ -1,37 +1,41 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import MenuItem from 'src/components/MenuItem'
 import * as A from 'src/redux/actions'
-import { getItems } from 'src/api'
 
 const Menu = () => {
-  const [data, setData] = useState('')
   const dispatch = useDispatch()
-  console.log(data.length)
-
-  const renderThis = () => {
-    if (data.length > 0) {
-      data.map(each => {
-        return (
-          <div>
-            {JSON.stringify(each.name)}
-          </div>
-        )
-      })
-    }
-  }
+  const items = useSelector(s => s.items)
+  const [createItem, setCreateItem] = useState('')
 
   useEffect(() => {
-    // getItems()
-    fetch('https://dog.ceo/api/breeds/image/random')
-      .then(res => res.json())
-      .then(data => setData(data))
-      .catch(error => error)
+    dispatch(A.fetchItems())
   }, [])
+
+  const handleChange = (e) => {
+    setCreateItem(e.target.value)
+  }
+
+  const handleCreate = (e) => {
+    e.preventDefault()
+    dispatch(A.createItem(createItem))
+    setCreateItem('')
+  }
 
   return (
     <div>
-      {JSON.stringify(data)}
-      {/* {renderThis()} */}
+      <h1>ITEMS</h1>
+      <form>
+        <input type="text" value={createItem} onChange={handleChange} placeholder="Item Name" />
+        <button onClick={handleCreate}>add</button>
+      </form>
+      {items.length > 0
+        ? items.map((item, index) => {
+          return (
+            <MenuItem key={`item-${index}`} id={item.id}>{item.name}</MenuItem>
+          )
+        })
+        : ''}
     </div>
   )
 }

@@ -1,41 +1,56 @@
 import * as A from '../actions'
 
 const defaultState = {
-  items: [
-    { id: 1, name: 'abc' },
-    { id: 1, name: 'def' },
-    { id: 3, name: 'ghi' }
-  ]
+  loading: false,
+  items: []
 }
 
 export default function appReducer(state = defaultState, action) {
   switch (action.type) {
     case A.CREATE:
-      return { ...state, items: action.item }
+      const { id, name, createdAt } = action.data
+      return {
+        ...state,
+        items: [
+          ...state.items,
+          { id, name, createdAt }
+        ]
+      }
     case A.READ:
       return state
     case A.UPDATE:
       const newItem = { ...action.item }
+      const updatedItems = state.items.map(item => {
+        var returnValue = { ...item };
+
+        if (item.id === newItem.id) {
+          returnValue = item.name === newItem.name ? item : newItem
+        }
+        return returnValue
+      })
+
       return {
-        items: [...state.items].map(item => {
-          item.id === newItem.id ? newItem : item
-        })
+        ...state,
+        items: [
+          ...updatedItems
+        ]
       }
     case A.DELETE:
-      const { id } = action
       return {
-        items: [...state.items].filter(item => item.id !== id)
+        items: [...state.items].filter(item => item.id !== action.id)
       }
     case A.FETCH_ITEMS_START:
-      return { ...state }
+      return { ...state, loading: true }
     case A.FETCH_ITEMS_SUCCESS:
       return {
         ...state,
+        loading: false,
         items: action.items
       }
     case A.FETCH_ITEMS_FAILURE:
       return {
         ...state,
+        loading: false,
         error: action.error,
         items: []
       }
