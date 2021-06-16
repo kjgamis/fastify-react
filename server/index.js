@@ -15,7 +15,7 @@ const dbconnector = async (fastify, options) => {
 }
 
 fastify.register(fastifyStatic, {
-  root: path.join(__dirname, '..', 'dist'),
+  root: path.join(__dirname, '..', 'build'),
 })
 fastify.register(fastifyCors, { 
   origin: true
@@ -33,3 +33,5 @@ fastify.listen(3000, (error) => {
   fastify.swagger()
   console.info(`Please visit http://localhost:${fastify.server.address().port}`)
 })
+
+module.exports = fastify

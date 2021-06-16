@@ -24,7 +24,12 @@ exports.addItem = {
     200: {
       type: 'object',
       properties: {
-        created: { type: 'boolean' }
+        status: { type: 'string' },
+        body: {
+          id: { type: 'string', format: 'uuid' },
+          name: { type: 'string' },
+          createdAt: { type: 'string', format: 'date-time' }
+        }
       }
     }
   }
@@ -49,7 +54,12 @@ exports.updateItem = {
     200: {
       type: 'object',
       properties: {
-        updated: { type: 'boolean' }
+        status: { type: 'string' },
+        body: {
+          id: { type: 'string', format: 'uuid' },
+          name: { type: 'string' },
+          createdAt: { type: 'string', format: 'date-time' }
+        }
       }
     }
   }
@@ -67,7 +77,12 @@ exports.deleteItem = {
     200: {
       type: 'object',
       properties: {
-        deleted: { type: 'boolean' }
+        status: { type: 'string' },
+        body: {
+          id: { type: 'string', format: 'uuid' },
+          name: { type: 'string' },
+          createdAt: { type: 'string', format: 'date-time' }
+        }
       }
     }
   }

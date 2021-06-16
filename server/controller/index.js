@@ -1,13 +1,14 @@
 const { v4: uuidv4 } = require('uuid')
-const client = require('./dbClient')
+const client = require('../dbClient')
 
 const controller = {
 
   fetchItems: async (request, reply) => {
-    client.query('SELECT * FROM todos', (error, results) => {
-      if (error) throw new Error(error)
-      reply.status(200).send(results.rows)
-    })
+    const query = 'SELECT * FROM todos'
+
+    const { rows } = await client.query(query)
+    return reply.send(rows)
+
   },
 
   addItem: async (request, reply) => {
@@ -19,11 +20,10 @@ const controller = {
       values: [id, name, createdAt]
     }
 
-    client.query(query, (error, results) => {
-      if (error) throw new Error(error)
-      console.log(results.rows)
-      reply.status(200).send({ created: true })
-    })
+    const { rows } = await client.query(query)
+    console.log(rows)
+    return reply.send({ status: "success", body: rows[0] })
+
   },
 
   updateItem: async (request, reply) => {
@@ -33,11 +33,11 @@ const controller = {
       text: `UPDATE todos SET name = $2 WHERE id = $1 RETURNING *`,
       values: [id, name]
     }
-    client.query(query, (error, results) => {
-      if (error) throw new Error(error)
-      console.log(results.rows)
-      reply.status(200).send({ updated: true })
-    })
+
+    const { rows } = await client.query(query)
+    console.log(rows)
+    return reply.send({ status: "success", body: rows[0] })
+
   },
 
   deleteItem: async (request, reply) => {
@@ -46,11 +46,11 @@ const controller = {
       text: `DELETE FROM todos WHERE id = $1 RETURNING *`,
       values: [id]
     }
-    client.query(query, (error, results) => {
-      if (error) throw new Error(error)
-      console.log(results.rows)
-      reply.status(200).send({ deleted: true })
-    })
+
+    const { rows } = await client.query(query)
+    console.log(rows)
+    return reply.send({ status: "success", body: rows[0] })
+
   }
 }
 
